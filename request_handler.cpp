@@ -59,7 +59,7 @@ void request_handler::toppage(reply& rep){
 "<table style=\"width:100%;height:100%\">"
 "<tr><td colspan=\"2\">"
 "<h1>Sapporo.cpp @ オープンソースカンファレンスHokkaido2017</h1>"
-"<p>このWebサーバはC++ (boost::asio, boost::filesystem) で書かれています。ソースコード→</p>"
+"<p>このWebサーバはC++ (boost::asio, boost::filesystem) で書かれています。ソースコード→<a href=\"https://github.com/maraigue/osc2017-content-display\" target=\"_blank\">https://github.com/maraigue/osc2017-content-display</a></p>"
 "</td></tr>"
 "<tr>"
 "<td style=\"width:20%;height:100%;vertical-align:top\"><ul>"
