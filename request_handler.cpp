@@ -11,6 +11,7 @@
 #include "request_handler.hpp"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 #include <string>
 #include "mime_types.hpp"
 #include "reply.hpp"
@@ -69,11 +70,13 @@ void request_handler::toppage(reply& rep){
   fs::directory_iterator end;
   std::size_t counted_files = 0;
   
-	for (fs::directory_iterator it(dir); it != end; ++it )
-	{
-		if( fs::is_regular_file(*it) ){
-		  std::string fname;
-		  append_escaped_name(it->path().filename().native(), fname);
+  for (fs::directory_iterator it(dir); it != end; ++it )
+  {
+    if( fs::is_regular_file(*it) &&
+        it->path().extension().compare(".css") != 0 &&
+        it->path().extension().compare(".js") != 0){
+      std::string fname;
+      append_escaped_name(it->path().filename().native(), fname);
       rep.content.append("<li><a href=\"/");
       rep.content.append(fname);
       rep.content.append("\" target=\"content\">");
@@ -82,11 +85,11 @@ void request_handler::toppage(reply& rep){
       rep.content.append("</li>");
       
       ++counted_files;
-		}
-	}
-	if(counted_files == 0){
+    }
+  }
+  if(counted_files == 0){
     rep.content.append("<li style=\"color:red\">エラー：表示できるファイルが見つかりませんでした。</li>");
-	}
+  }
   
   rep.content.append(
 "</ul></td>"
@@ -120,10 +123,10 @@ void request_handler::handle_request(const request& req, reply& rep)
 
   // Special handler defined by H.Hiro
   std::string extension;
-	
+  
   if (request_path.length() >= 2 && request_path.find_last_of("/\\") == 0){
     // ------------------------------------------------------------
-  	// Returns a file in CONTENT_FILE_DIRECTORY
+    // Returns a file in CONTENT_FILE_DIRECTORY
     // ------------------------------------------------------------
     // Determine the file extension.
     std::size_t last_dot_pos = request_path.find_last_of(".");
@@ -132,12 +135,13 @@ void request_handler::handle_request(const request& req, reply& rep)
       extension = request_path.substr(last_dot_pos + 1);
     }
 
-  	std::string full_path;
-  	full_path.reserve(request_path.length() + CONTENT_FILE_DIRECTORY_LENGTH);
-  	full_path.append(CONTENT_FILE_DIRECTORY);
-  	full_path.append(request_path);
+    std::string full_path;
+    full_path.reserve(request_path.length() + CONTENT_FILE_DIRECTORY_LENGTH);
+    full_path.append(CONTENT_FILE_DIRECTORY);
+    full_path.append(request_path);
+    std::cerr << full_path << std::endl;
 
-	  // Open the file to send back.
+    // Open the file to send back.
     std::ifstream is(full_path.c_str(), std::ios::in | std::ios::binary);
     if (!is)
     {
@@ -156,7 +160,7 @@ void request_handler::handle_request(const request& req, reply& rep)
     toppage(rep);
     extension.assign("html");
   }else{
-  	rep = reply::stock_reply(reply::not_found);
+    rep = reply::stock_reply(reply::not_found);
     return;
   }
   
