@@ -25,6 +25,8 @@ struct mapping
   { "html", "text/html" },
   { "jpg", "image/jpeg" },
   { "png", "image/png" },
+  { "css", "text/css" },
+  { "js", "text/javascript" },
   { "pdf", "application/pdf" }
 };
 
