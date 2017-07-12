@@ -41,6 +41,7 @@ public:
   
   void toppage(reply& rep);
   void append_escaped_name(const std::string & source, std::string & target);
+  void append_encoded_name(const std::string & source, std::string & target);
 
 private:
   /// The directory containing the files to be served.

@@ -25,6 +25,36 @@ request_handler::request_handler(const std::string& doc_root)
 {
 }
 
+char hexchar(char num){
+  if(num >= 0 && num <= 9){
+    return '0' + num;
+  }else if(num >= 10 && num <= 15){
+    return 'A' - 10 + num;
+  }else{
+    return 0;
+  }
+}
+
+void request_handler::append_encoded_name(const std::string & source, std::string & target){
+  for(std::size_t i = 0; i < source.length(); ++i){
+    switch(source[i]){
+    case '-': case '_': case '~': case '.':
+      target.append(1, source[i]);
+      break;
+    default:
+      if(source[i] < '0' || (source[i] > '9' && source[i] < 'A') ||
+         (source[i] > 'Z' && source[i] < 'a') || source[i] > 'z'){
+        target.append(1, '%');
+        target.append(1, hexchar((source[i] >> 4) & 0x0F));
+        target.append(1, hexchar(source[i] & 0x0F));
+      }else{
+        target.append(1, source[i]);
+      }
+      break;
+    }
+  }
+}
+
 void request_handler::append_escaped_name(const std::string & source, std::string & target){
   for(std::size_t i = 0; i < source.length(); ++i){
     switch(source[i]){
@@ -75,12 +105,13 @@ void request_handler::toppage(reply& rep){
     if( fs::is_regular_file(*it) &&
         it->path().extension().compare(".css") != 0 &&
         it->path().extension().compare(".js") != 0){
-      std::string fname;
-      append_escaped_name(it->path().filename().native(), fname);
+      std::string fname_escape, fname_encode;
+      append_escaped_name(it->path().filename().native(), fname_escape);
+      append_encoded_name(it->path().filename().native(), fname_encode);
       rep.content.append("<li><a href=\"/");
-      rep.content.append(fname);
+      rep.content.append(fname_encode);
       rep.content.append("\" target=\"content\">");
-      rep.content.append(fname);
+      rep.content.append(fname_escape);
       rep.content.append("</a>");
       rep.content.append("</li>");
       
